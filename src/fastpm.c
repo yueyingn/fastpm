@@ -511,9 +511,9 @@ induce:
 
     /* add constraints */
     if(CONF(prr->lua, constraints)) {
-        FastPM2PCF xi;
+//         FastPM2PCF xi;
 
-        fastpm_2pcf_from_powerspectrum(&xi, (fastpm_fkfunc) fastpm_powerspectrum_eval2, &linear_powerspectrum, CONF(prr->lua, boxsize), CONF(prr->lua, nc));
+//         fastpm_2pcf_from_powerspectrum(&xi, (fastpm_fkfunc) fastpm_powerspectrum_eval2, &linear_powerspectrum, CONF(prr->lua, boxsize), CONF(prr->lua, nc));
 
         FastPMConstrainedGaussian cg = {
             .constraints = malloc(sizeof(FastPMConstraint) * (CONF(prr->lua, n_constraints) + 1)),
@@ -522,22 +522,24 @@ induce:
         int i;
         for(i = 0; i < CONF(prr->lua, n_constraints); i ++) {
             double * c = CONF(prr->lua, constraints);
-            cg.constraints[i].x[0] = c[4 * i + 0];
-            cg.constraints[i].x[1] = c[4 * i + 1];
-            cg.constraints[i].x[2] = c[4 * i + 2];
-            cg.constraints[i].c = c[4 * i + 3];
-            fastpm_info("Constraint %d : %g %g %g peak-sigma = %g\n", i, c[4 * i + 0], c[4 * i + 1], c[4 * i + 2], c[4 * i + 3]);
+            cg.constraints[i].x[0] = c[5 * i + 0];
+            cg.constraints[i].x[1] = c[5 * i + 1];
+            cg.constraints[i].x[2] = c[5 * i + 2];                
+            cg.constraints[i].c = c[5 * i + 3];
+            cg.constraints[i].rg = c[5 * i + 4];
+            fastpm_info("Constraint %d : %g %g %g peak-sigma = %g Range = %g \n", i, c[5 * i + 0], c[5 * i + 1], c[5 * i + 2], c[5 * i + 3], c[5 * i + 4]);
         }
         cg.constraints[i].x[0] = -1;
         cg.constraints[i].x[1] = -1;
         cg.constraints[i].x[2] = -1;
         cg.constraints[i].c = -1;
+        cg.constraints[i].rg = -1;
 
         if(CONF(prr->lua, write_lineark)) {
             fastpm_info("Writing fourier space linear field before constraints to %s\n", CONF(prr->lua, write_lineark));
             write_complex(pm, delta_k, CONF(prr->lua, write_lineark), "UnconstrainedLinearDensityK", prr->cli->Nwriters);
         }
-        fastpm_cg_apply_constraints(&cg, pm, &xi, delta_k);
+        fastpm_cg_apply_constraints(&cg, pm, (fastpm_fkfunc) fastpm_powerspectrum_eval2, &linear_powerspectrum, delta_k);
 
         free(cg.constraints);
     }

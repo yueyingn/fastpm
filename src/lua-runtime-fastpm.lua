@@ -219,13 +219,13 @@ schema.force_softening_type.choices = {
     twothird = 'FASTPM_SOFTENING_TWO_THIRD',
 }
 
-schema.declare{name='constraints',      type='array:number',  help="A list of {x, y, z, peak-sigma}, giving the constraints in MPC/h units. "}
+schema.declare{name='constraints',      type='array:number',  help="A list of {x, y, z, peak-sigma, Rg}, giving the constraints in MPC/h units. "}
 function schema.constraints.action (constraints)
     if constraints == nil then
         return
     end
     for i,v in pairs(constraints) do
-        if #v ~= 4 then
+        if #v ~= 5 then
             error("contraints must be a list of 4-vectors (x, y, z, peak-sigma)")
         end
     end

@@ -48,7 +48,7 @@ int main(int argc, char * argv[]) {
 
     FastPM2PCF xi;
 
-    fastpm_2pcf_from_powerspectrum(&xi, (fastpm_fkfunc) fastpm_utils_powerspec_eh, &eh, 128., 128);
+    fastpm_2pcf_from_powerspectrum(&xi, (fastpm_fkfunc) fastpm_utils_powerspec_eh, &eh, 128., 128, 1.45);
 
     FastPMConstrainedGaussian cg = {
             .constraints = (FastPMConstraint[]) {
@@ -58,7 +58,7 @@ int main(int argc, char * argv[]) {
             },
     };
 
-    fastpm_cg_apply_constraints(&cg, solver->pm, &xi, rho_init_ktruth);
+    fastpm_cg_apply_constraints(&cg, solver->pm, (fastpm_fkfunc) fastpm_utils_powerspec_eh, &eh, rho_init_ktruth);
 
     pm_free(solver->pm, rho_init_ktruth);
     fastpm_solver_destroy(solver);
